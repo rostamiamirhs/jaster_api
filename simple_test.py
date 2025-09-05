@@ -1,9 +1,9 @@
+import os
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, field_validator
 import uvicorn
-import os
 from datetime import datetime
 import netCDF4
 import numpy as np
@@ -808,5 +808,6 @@ def get_results(job_id: str):
         return {"error": "Results not found"}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))  # Cloud Run uses 8080
+    port = int(os.environ.get("PORT", 8080))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
