@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JASTER - Jason Altimetry Stand-alone Tool for Enhanced Research</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .logo-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"], input[type="number"], input[type="password"], select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .cycle-inputs {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 5px;
+            border: 1px solid #27ae60;
+        }
+
+        .cycle-inputs.active {
+            display: block;
+        }
+
+        .cycle-inputs h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-container {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .status-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .status-message {
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .job-id {
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border: 2px solid #27ae60;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .results-summary {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .download-section {
+            margin-top: 20px;
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .download-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .download-btn {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            transition: background 0.3s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: #2980b9;
+            text-decoration: none;
+            color: white;
+        }
+
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">University of Houston</div>
+                <div class="logo">NASA</div>
+            </div>
+            <h1>JASTER</h1>
+            <p>Jason Altimetry Stand-alone Tool for Enhanced Research</p>
+        </div>
+
+        <div class="main-content">
+            <form id="jasterForm">
+                <!-- Authentication Section -->
+                <div class="form-section">
+                    <h3>🔐 Authentication</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="avisoUsername">AVISO Username:</label>
+                            <input type="text" id="avisoUsername" name="aviso_username" required>
+                            <div class="help-text">Your AVISO FTP account username</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="avisoPassword">AVISO Password:</label>
+                            <input type="password" id="avisoPassword" name="aviso_password" required>
+                            <div class="help-text">Your AVISO FTP account password</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="apiKey">OpenTopography API Key:</label>
+                            <input type="text" id="apiKey" name="opentopography_api_key" required>
+                            <div class="help-text">Get free API key from <a href="https://portal.opentopography.org/requestAccess" target="_blank">OpenTopography.org</a></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Parameters Section -->
+                <div class="form-section">
+                    <h3>🛰️ Satellite Parameters</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="series">Jason Series:</label>
+                            <select id="series" name="series" onchange="updateCycleInputs()" required>
+                                <option value="">Select series...</option>
+                                <option value="2">Jason-2 only</option>
+                                <option value="3">Jason-3 only</option>
+                                <option value="1">Both Jason-2 and Jason-3</option>
+                            </select>
+                            <div class="help-text">Choose which Jason satellite data to process</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="passNumber">Pass Number (1-254):</label>
+                            <input type="number" id="passNumber" name="pass_number" min="1" max="254" required>
+                            <div class="help-text">Satellite ground track number</div>
+                        </div>
+                    </div>
+
+                    <!-- Jason-2 Cycle Inputs -->
+                    <div id="jason2Cycles" class="cycle-inputs">
+                        <h4>Jason-2 Cycle Range (1-303)</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startCycle2">Start Cycle:</label>
+                                <input type="number" id="startCycle2" name="start_cycle_2" min="1" max="303">
+                            </div>
+                            <div class="form-group">
+                                <label for="endCycle2">End Cycle:</label>
+                                <input type="number" id="endCycle2" name="end_cycle_2" min="1" max="303">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jason-3 Cycle Inputs -->
+                    <div id="jason3Cycles" class="cycle-inputs">
+                        <h4>Jason-3 Cycle Range (1-226)</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startCycle3">Start Cycle:</label>
+                                <input type="number" id="startCycle3" name="start_cycle_3" min="1" max="226">
+                            </div>
+                            <div class="form-group">
+                                <label for="endCycle3">End Cycle:</label>
+                                <input type="number" id="endCycle3" name="end_cycle_3" min="1" max="226">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geographic Parameters Section -->
+                <div class="form-section">
+                    <h3>🌍 Geographic Bounds</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="minLat">Minimum Latitude:</label>
+                            <input type="number" id="minLat" name="min_lat" step="0.001" min="-60" max="80" required>
+                            <div class="help-text">Southern boundary (-60° to 80°)</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxLat">Maximum Latitude:</label>
+                            <input type="number" id="maxLat" name="max_lat" step="0.001" min="-60" max="80" required>
+                            <div class="help-text">Northern boundary (-60° to 80°)</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="minLon">Minimum Longitude:</label>
+                            <input type="number" id="minLon" name="min_lon" step="0.001" min="-180" max="179" required>
+                            <div class="help-text">Western boundary (-180° to 179°)</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxLon">Maximum Longitude:</label>
+                            <input type="number" id="maxLon" name="max_lon" step="0.001" min="-180" max="179" required>
+                            <div class="help-text">Eastern boundary (-180° to 179°)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Options Section -->
+                <div class="form-section">
+                    <h3>⚙️ Processing Options</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="outlierMethod">Outlier Removal Method:</label>
+                            <select id="outlierMethod" name="outlier_removal_method">
+                                <option value="all">All methods (recommended)</option>
+                                <option value="iqr">IQR method only</option>
+                                <option value="dem_wo">DEM + Water Occurrence only</option>
+                                <option value="none">No outlier removal</option>
+                            </select>
+                            <div class="help-text">Choose how to filter noisy data points</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hgtThreshold">Height Threshold (m):</label>
+                            <input type="number" id="hgtThreshold" name="hgt_dem_diff_thrd" min="1" value="5">
+                            <div class="help-text">Maximum height difference from DEM (default: 5m)</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="woThreshold">Water Occurrence Threshold (%):</label>
+                            <input type="number" id="woThreshold" name="wo_thrd" min="0" max="100" value="50">
+                            <div class="help-text">Minimum water occurrence percentage (default: 50%)</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hampelWindow">Hampel Filter Window:</label>
+                            <input type="number" id="hampelWindow" name="hampel_window" min="0" max="20" value="0">
+                            <div class="help-text">Window size for Hampel filter (0 = disabled)</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="hampelSigma">Hampel Sensitivity:</label>
+                            <input type="number" id="hampelSigma" name="hampel_sigma" min="0.1" max="5.0" step="0.1" value="3.0">
+                            <div class="help-text">Sensitivity parameter (default: 3.0)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Section -->
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn" id="submitBtn">Start Processing</button>
+                </div>
+            </form>
+
+            <!-- Progress Section -->
+            <div id="statusContainer" class="status-container">
+                <h3>🔄 Processing Status</h3>
+                <div class="job-id" id="jobIdDisplay"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="status-message" id="statusMessage">Initializing...</div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsContainer" class="results-container">
+                <h3>✅ Processing Complete!</h3>
+                <div class="results-summary" id="resultsSummary"></div>
+                <div class="download-section">
+                    <h4>📥 Download Results</h4>
+                    <div class="download-grid" id="downloadGrid">
+                        <!-- Download links will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorMessage" class="error-message">
+                <!-- Error messages will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentJobId = null;
+        let pollInterval = null;
+
+        function updateCycleInputs() {
+            const series = document.getElementById('series').value;
+            const jason2Div = document.getElementById('jason2Cycles');
+            const jason3Div = document.getElementById('jason3Cycles');
+            
+            // Hide all cycle inputs first
+            jason2Div.classList.remove('active');
+            jason3Div.classList.remove('active');
+            
+            // Clear required attributes
+            ['startCycle2', 'endCycle2', 'startCycle3', 'endCycle3'].forEach(id => {
+                const field = document.getElementById(id);
+                if (field) field.required = false;
+            });
+            
+            // Show relevant inputs based on selection
+            if (series === '1') {
+                // Both series - show both
+                jason2Div.classList.add('active');
+                jason3Div.classList.add('active');
+                ['startCycle2', 'endCycle2', 'startCycle3', 'endCycle3'].forEach(id => {
+                    document.getElementById(id).required = true;
+                });
+            } else if (series === '2') {
+                // Jason-2 only
+                jason2Div.classList.add('active');
+                ['startCycle2', 'endCycle2'].forEach(id => {
+                    document.getElementById(id).required = true;
+                });
+            } else if (series === '3') {
+                // Jason-3 only
+                jason3Div.classList.add('active');
+                ['startCycle3', 'endCycle3'].forEach(id => {
+                    document.getElementById(id).required = true;
+                });
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+            setTimeout(() => {
+                errorDiv.classList.remove('active');
+            }, 8000);
+        }
+
+        function updateProgress(progress, message, jobId = null) {
+            const statusContainer = document.getElementById('statusContainer');
+            const progressFill = document.getElementById('progressFill');
+            const statusMessage = document.getElementById('statusMessage');
+            const jobIdDisplay = document.getElementById('jobIdDisplay');
+            
+            statusContainer.classList.add('active');
+            progressFill.style.width = `${progress * 100}%`;
+            statusMessage.textContent = message;
+            
+            if (jobId) {
+                jobIdDisplay.textContent = `Job ID: ${jobId}`;
+            }
+        }
+
+		function showResults(jobId, statusData) {
+			const resultsContainer = document.getElementById('resultsContainer');
+			const resultsSummary = document.getElementById('resultsSummary');
+			const downloadGrid = document.getElementById('downloadGrid');
+			
+			// Show summary
+			resultsSummary.innerHTML = `
+				<h4>Processing Summary</h4>
+				<p><strong>Job ID:</strong> ${jobId}</p>
+				<p><strong>Status:</strong> ${statusData.status}</p>
+				<p><strong>Message:</strong> ${statusData.message}</p>
+				<p><strong>Completed:</strong> ${new Date(statusData.timestamp).toLocaleString()}</p>
+			`;
+			
+			// Create download links
+			downloadGrid.innerHTML = '';
+			
+			const downloadTypes = [
+				{ type: 'iqr_data', label: 'IQR Method Data', desc: 'Time series data (TXT)' },
+				{ type: 'srtm_data', label: 'SRTM Method Data', desc: 'Time series data (TXT)' },
+				{ type: 'nofilter_data', label: 'No Filter Data', desc: 'Time series data (TXT)' },
+				{ type: 'iqr_plot', label: 'IQR Method Plot', desc: 'Visualization (PNG)' },
+				{ type: 'srtm_plot', label: 'SRTM Method Plot', desc: 'Visualization (PNG)' },
+				{ type: 'nofilter_plot', label: 'No Filter Plot', desc: 'Visualization (PNG)' }
+			];
+			
+			downloadTypes.forEach(item => {
+				const downloadItem = document.createElement('div');
+				downloadItem.className = 'download-item';
+				downloadItem.innerHTML = `
+					<strong>${item.label}</strong>
+					<div style="font-size: 0.9em; color: #666; margin: 5px 0;">${item.desc}</div>
+					<a href="/api/altimetry/download/${jobId}/${item.type}" 
+					   class="download-btn" 
+					   download="${item.type}_${jobId}">
+						Download
+					</a>
+				`;
+				downloadGrid.appendChild(downloadItem);
+			});
+			
+			resultsContainer.classList.add('active');
+		}
+
+
+        async function pollJobStatus(jobId) {
+            try {
+                const response = await fetch(`/status/${jobId}`);
+                const status = await response.json();
+                
+                updateProgress(status.progress || 0, status.message, jobId);
+                
+                if (status.status === 'completed') {
+                    clearInterval(pollInterval);
+                    showResults(jobId, status);
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('submitBtn').textContent = 'Start Processing';
+                } else if (status.status === 'failed') {
+                    clearInterval(pollInterval);
+                    showError(`Processing failed: ${status.message}`);
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('submitBtn').textContent = 'Start Processing';
+                    document.getElementById('statusContainer').classList.remove('active');
+                }
+            } catch (error) {
+                clearInterval(pollInterval);
+                showError(`Error checking job status: ${error.message}`);
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Start Processing';
+            }
+        }
+
+        document.getElementById('jasterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            
+            // Hide previous results/errors
+            document.getElementById('resultsContainer').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('active');
+            
+            // Collect form data
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Convert numeric fields
+            const numericFields = ['series', 'pass_number', 'min_lat', 'max_lat', 'min_lon', 'max_lon', 
+                                 'start_cycle_2', 'end_cycle_2', 'start_cycle_3', 'end_cycle_3',
+                                 'hgt_dem_diff_thrd', 'wo_thrd', 'hampel_window', 'hampel_sigma'];
+            
+            numericFields.forEach(field => {
+                if (data[field] !== undefined && data[field] !== '') {
+                    data[field] = parseFloat(data[field]);
+                }
+            });
+            
+            // Remove empty fields
+            Object.keys(data).forEach(key => {
+                if (data[key] === '' || data[key] === null) {
+                    delete data[key];
+                }
+            });
+            
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to start processing');
+                }
+                
+                const result = await response.json();
+                currentJobId = result.job_id;
+                
+                // Start polling for status updates
+                updateProgress(0, 'Job started, initializing...', currentJobId);
+                pollInterval = setInterval(() => pollJobStatus(currentJobId), 2000);
+                
+            } catch (error) {
+                showError(`Error starting processing: ${error.message}`);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Start Processing';
+            }
+        });
+
+        // Initialize form with default values
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('passNumber').value = '17';
+            // Set some example coordinates
+            document.getElementById('minLat').value = '50.697';
+            document.getElementById('maxLat').value = '50.786';
+            document.getElementById('minLon').value = '-98.592';
+            document.getElementById('maxLon').value = '-98.699';
+        });
+    </script>
+</body>
+</html>
