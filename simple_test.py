@@ -808,5 +808,5 @@ def get_results(job_id: str):
         return {"error": "Results not found"}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8080))  # Cloud Run uses 8080
     uvicorn.run(app, host="0.0.0.0", port=port)
